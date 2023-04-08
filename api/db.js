@@ -29,6 +29,10 @@ const User = sequelize.define("user", {
 });
 
 const BP = sequelize.define("bp", {
+  id:{
+    type: Sequelize.INTEGER,
+    primaryKey: true
+  },
   b1: {
     type: Sequelize.STRING,
   },
@@ -36,10 +40,21 @@ const BP = sequelize.define("bp", {
     type: Sequelize.STRING,
   },
   path: {
-    type: Sequelize.JSON,
+    type: Sequelize.ARRAY,
   },
 });
 
+const Obstacle = sequelize.define("obstacle", {
+  id: {
+    type: Sequelize.INTEGER,
+  },
+  boundaryType:{
+    type: Sequelize.STRING,
+  },
+  boundary:{
+    type: Sequelize.JSON,
+  },
+});
 const dbinit = async () => {
   await User.sync({ force: true });
   await User.bulkCreate([
@@ -58,8 +73,27 @@ const dbinit = async () => {
       classes: [],
     },
   ]);
+  await BP.sync({ force: true });
+  await BP.bulkCreate([
+    {
+     b1: "Montgomery Hall",
+     b2: "Sheep Barn",
+     path: [],
+    },
+    {
+      b1: "Sheep Barn",
+      b2: "Eppley Recreation Center",
+      path: [],
+     },
+     {
+      b1: "Montgomery Hall",
+      b2: "Eppley Recreation Center",
+      path: [],
+     },
+  ]);
   const users = await User.findAll();
+
   console.log(users);
 };
 
-module.exports = { sequelize, User };
+module.exports = { sequelize, User, BP, Obstacle, dbinit };

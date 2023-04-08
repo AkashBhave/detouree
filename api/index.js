@@ -3,7 +3,7 @@ const fastify = require("fastify")({
   logger: true,
 });
 
-const { User } = require("./db");
+const { User, BP, Obstacle, dbinit } = require("./db");
 
 fastify.get("/", function (req, reply) {
   reply.send("Welcome to Detouree!");
@@ -42,6 +42,72 @@ fastify.post("/users", async (req, res) => {
   return user;
 });
 
+//--------------------------------------------------
+//BP
+
+fastify.get("/BP/:id", async (req, res) => {
+  const { id } = req.params;
+  const buildingPair = await BP.findOne({
+    where: { id },
+  });
+  if (id == null) return res.status(404).send();
+  return buildingPair;
+});
+
+fastify.post("/BPs", async (req, res) => {
+  const { id, building1, building2, path } = req.body;
+  if (
+    id == null ||
+    id == "" ||
+    building1 == null ||
+    building1 == "" ||
+    building2 == null ||
+    building2 == "" ||
+    path == null ||
+    path == ""
+  )
+    return res.status(400).send();
+  const buildingPair = await BP.create({
+    id,
+    building1,
+    building2,
+    path,
+    
+  });
+  if (buildingPair == null) return res.status(404).send();
+  return buildingPair;
+});
+
+//--------------------------------------------------
+//Obstacle
+
+fastify.get("/obstacles/:id", async (req, res) => {
+  const { id } = req.params;
+  const obstacle = await Obstacle.findOne({
+    where: { id },
+  });
+  if (id == null) return res.status(404).send();
+  return obstacle;
+});
+
+fastify.post("/obstacles", async (req, res) => {
+  const { id, boundary } = req.body;
+  if (
+    id == null ||
+    id == "" ||
+    boundary == null ||
+    boundary == ""
+  )
+    return res.status(400).send();
+  const obstacle = await Obstacle.create({
+    id,
+    boundary,
+    
+  });
+  if (obstacle == null) return res.status(404).send();
+  return obstacle;
+});
+
 fastify.post("/auth", async (req, res) => {
   const { username, password } = req.body;
   if (username == null || password == null) return res.status(400).send();
@@ -52,6 +118,7 @@ fastify.post("/auth", async (req, res) => {
   return user;
 });
 
+dbinit()
 // Run the server!
 fastify.listen({ port: 3000 }, function (err, address) {
   if (err) {
