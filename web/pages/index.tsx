@@ -13,20 +13,6 @@ import Head from "next/head";
 import axios from "axios";
 
 const Home = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const submit = () => {
-    if (username == "" || password == "") return;
-    axios
-      .post(`${process.env.API_URL}/auth`, { username, password })
-      .then((res) => {
-        const user = res.data;
-        localStorage.setItem("user", JSON.stringify(user));
-      })
-      .catch((err) => {});
-  };
-
   return (
     <>
       <Head>
@@ -35,45 +21,7 @@ const Home = () => {
       </Head>
       <main style={{ height: "100%" }}>
         <Center h="full" flexDir="column">
-          <Heading as="h1" fontSize={32} fontWeight="bold" mb={8}>
-            Log In
-          </Heading>
-          <VStack
-            as="form"
-            w="500px"
-            border="1px solid lightgray"
-            p={4}
-            fontSize={24}
-            rounded="md"
-            spacing={6}
-          >
-            <Box w="full">
-              <Text mb={2}>Username</Text>
-              <Input
-                w="full"
-                border="1px solid lightgray"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                padding={2}
-                rounded="md"
-              />
-            </Box>
-            <Box w="full">
-              <Text mb={2}>Password</Text>
-              <Input
-                w="full"
-                border="1px solid lightgray"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                padding={2}
-                rounded="md"
-              />
-            </Box>
-            <Button colorScheme="red" onClick={submit}>
-              Submit
-            </Button>
-          </VStack>
+          Welcome to Detouree!
         </Center>
       </main>
     </>
