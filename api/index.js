@@ -3,6 +3,20 @@ const fastify = require("fastify")({
   logger: true,
 });
 
+fastify.register(require("@fastify/cors"), (instance) => {
+  return (req, callback) => {
+    const corsOptions = {
+      origin: true,
+    };
+
+    if (/^localhost$/m.test(req.headers.origin)) {
+      corsOptions.origin = false;
+    }
+
+    callback(null, corsOptions);
+  };
+});
+
 const { dbinit, User, BP, Obstacle } = require("./db");
 
 fastify.get("/", function (req, reply) {
