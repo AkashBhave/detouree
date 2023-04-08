@@ -29,9 +29,10 @@ const User = sequelize.define("user", {
 });
 
 const BP = sequelize.define("bp", {
-  id:{
+  id: {
     type: Sequelize.INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true,
   },
   b1: {
     type: Sequelize.STRING,
@@ -40,21 +41,30 @@ const BP = sequelize.define("bp", {
     type: Sequelize.STRING,
   },
   path: {
-    type: Sequelize.ARRAY,
+    type: Sequelize.JSON,
   },
 });
 
 const Obstacle = sequelize.define("obstacle", {
   id: {
     type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  boundaryType:{
+  name: {
     type: Sequelize.STRING,
   },
-  boundary:{
+  updates: {
+    type: Sequelize.JSON,
+  },
+  boundaryType: {
+    type: Sequelize.STRING,
+  },
+  boundary: {
     type: Sequelize.JSON,
   },
 });
+
 const dbinit = async () => {
   await User.sync({ force: true });
   await User.bulkCreate([
@@ -76,24 +86,43 @@ const dbinit = async () => {
   await BP.sync({ force: true });
   await BP.bulkCreate([
     {
-     b1: "Montgomery Hall",
-     b2: "Sheep Barn",
-     path: [],
+      b1: "Montgomery Hall",
+      b2: "Sheep Barn",
+      path: [],
     },
     {
       b1: "Sheep Barn",
       b2: "Eppley Recreation Center",
       path: [],
-     },
-     {
+    },
+    {
       b1: "Montgomery Hall",
       b2: "Eppley Recreation Center",
       path: [],
-     },
+    },
   ]);
-  const users = await User.findAll();
+  await Obstacle.sync({ force: true });
+  await Obstacle.bulkCreate([
+    {
+      name: "Zupnik Hall groundbreaking",
+      boundaryType: "segment",
+      boundary: [],
+      updates: [],
+    },
+    {
+      name: "Purple Line construction",
+      boundaryType: "area",
+      boundary: [],
+      updates: [],
+    },
+  ]);
 
-  console.log(users);
+  const users = await User.findAll();
+  users.forEach((u) => console.log(`${u.firstName} ${u.lastName}`));
+  const bps = await BP.findAll();
+  bps.forEach((bp) => console.log(`${bp.b1} ${bp.b2}`));
+  const obstacles = await Obstacle.findAll();
+  obstacles.forEach((o) => console.log(o.name));
 };
 
 module.exports = { sequelize, User, BP, Obstacle, dbinit };
