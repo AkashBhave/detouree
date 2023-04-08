@@ -30,14 +30,46 @@ fastify.post("/users", async (req, res) => {
     firstName == "" ||
     lastName == null ||
     lastName == ""
-  )
+  ) {
     return res.status(400).send();
+  }
+
+  const buildingPairs = [];
+  for (const c of classes) {
+    const { b1, b2 } = c;
+    // First, query for (b1, b2)
+    let buildingPair = await BP.findOne({
+      where: { b1: b1, b2: b2 },
+    });
+    if (buildingPair != null) {
+      buildingPairs.push(buildingPair.id);
+    } else {
+      // Next, query for (b2, b1)
+      buildingPair = await BP.findOne({
+        where: { b1: b2, b2: b1 },
+      });
+      if (buildingPair != null) {
+        buildingPairs.push(buildingPair.id);
+      } else {
+        // Create a new BP
+        // TODO: compute the path
+        const path = [];
+        const buildingPair = await BP.create({
+          b1,
+          b2,
+          path,
+        });
+        buildingPairs.push(buildingPair.id);
+      }
+    }
+  }
+
   const user = await User.create({
     username,
     password,
     firstName,
     lastName,
-    classes,
+    classes: buildingPairs,
   });
   if (user == null) return res.status(404).send();
   return user;
@@ -60,21 +92,13 @@ fastify.get("/bps", async (req, res) => {
 });
 
 fastify.post("/bps", async (req, res) => {
-  const { id, building1, building2, path } = req.body;
-  if (
-    id == null ||
-    id == "" ||
-    building1 == null ||
-    building1 == "" ||
-    building2 == null ||
-    building2 == "" ||
-    path == null
-  )
+  const { b1, b2, path } = req.body;
+  if (b1 == null || b1 == "" || b2 == null || b2 == "" || path == null)
     return res.status(400).send();
+  // TODO: compute the path
   const buildingPair = await BP.create({
-    id,
-    building1,
-    building2,
+    b1,
+    b2,
     path,
   });
   if (buildingPair == null) return res.status(404).send();
