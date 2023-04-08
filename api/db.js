@@ -28,6 +28,18 @@ const User = sequelize.define("user", {
   },
 });
 
+const BP = sequelize.define("bp", {
+  b1: {
+    type: Sequelize.STRING,
+  },
+  b2: {
+    type: Sequelize.STRING,
+  },
+  path: {
+    type: Sequelize.JSON,
+  },
+});
+
 const dbinit = async () => {
   await User.sync({ force: true });
   await User.bulkCreate([
@@ -36,6 +48,13 @@ const dbinit = async () => {
       password: "password",
       firstName: "Akash",
       lastName: "Bhave",
+      classes: [],
+    },
+    {
+      username: "js",
+      password: "password",
+      firstName: "John",
+      lastName: "Smith",
       classes: [],
     },
   ]);
