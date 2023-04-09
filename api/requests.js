@@ -1388,8 +1388,8 @@ let buildings = [
   {
     name: "Hornbake Library",
     addr: "Hornbake Library, College Park, MD",
-    lat: 38.98814,
-    lng: -76.9414700999999,
+    lat: 38.98823989284182,
+    lng: -76.94135020485199,
   },
   {
     name: "Horse Barn",
@@ -2060,8 +2060,8 @@ let buildings = [
   {
     name: "South Campus Dining Hall",
     addr: "South Campus Dining Hall, College Park, MD",
-    lat: 38.9830244,
-    lng: -76.9436908999999,
+    lat: 38.98333355074696,
+    lng: -76.943697594899,
   },
   {
     name: "South Gate",
