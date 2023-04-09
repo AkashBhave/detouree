@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import Head from "next/head";
 import axios from "axios";
-import Map from "react-map-gl";
+import Map, { NavigationControl } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -93,7 +93,9 @@ const Home = () => {
           style={{ width: "100%", height: "100%" }}
           // @ts-ignore
           mapStyle={style}
-        />
+        >
+          <NavigationControl />
+        </Map>
         <Box w="500px" h="full" p={4}>
           <VStack align="start" divider={<StackDivider />}>
             {obstacles.map((o) => (

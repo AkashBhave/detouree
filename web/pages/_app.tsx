@@ -49,6 +49,11 @@ export default function App({ Component, pageProps }: AppProps) {
                 <CLink as="span">Campus Map</CLink>
               </Button>
             </Link>
+            <Link passHref href="/update">
+              <Button variant="outline" colorScheme="blue" px={2}>
+                <CLink as="span">Submit an Update</CLink>
+              </Button>
+            </Link>
             {isUser === undefined ? null : isUser === false ? (
               <>
                 <Link passHref href="/log-in">

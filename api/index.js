@@ -137,11 +137,12 @@ fastify.get("/obstacles", async (req, res) => {
 });
 
 fastify.post("/obstacles", async (req, res) => {
-  const { id, boundary } = req.body;
-  if (id == null || id == "" || boundary == null || boundary == "")
+  const { boundary, name } = req.body;
+  if (name == null || name == "" || boundary == null || boundary == "")
     return res.status(400).send();
   const obstacle = await Obstacle.create({
-    id,
+    name,
+    type: "area",
     boundary,
   });
   if (obstacle == null) return res.status(404).send();
