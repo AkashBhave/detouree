@@ -1,5 +1,8 @@
-import updateUsers from 'twilioTest.js'
+// import updateUsers from "twilioTest.js";
 require("dotenv").config();
+const turf = require("@turf/turf");
+
+const algos = require("./requests");
 
 const fastify = require("fastify")({
   logger: true,
@@ -36,7 +39,7 @@ fastify.get("/users/:username", async (req, res) => {
 });
 
 fastify.post("/users", async (req, res) => {
-  const { username, password, firstName, lastName, classes } = req.body;
+  const { username, password, firstName, lastName, phone, classes } = req.body;
   if (
     username == null ||
     username == "" ||
@@ -49,7 +52,7 @@ fastify.post("/users", async (req, res) => {
     classes == null ||
     classes == "" ||
     phone == null ||
-    phone == "" 
+    phone == ""
   ) {
     return res.status(400).send();
   }
@@ -72,12 +75,21 @@ fastify.post("/users", async (req, res) => {
         buildingPairs.push(buildingPair.id);
       } else {
         // Create a new BP
-        // TODO: compute the path
-        const path = [];
+        const b1Coords = algos.getCoords(b1);
+        const b2Coords = algos.getCoords(b2);
+        const obstacles = await Obstacle.findAll();
+        const bboxes = obstacles.map((o) => {
+          const bbox = turf.bbox(o.boundary);
+          return [
+            [bbox[1], bbox[0]],
+            [bbox[3], bbox[2]],
+          ];
+        });
+        const [dist, path] = await algos.req(b1Coords, b2Coords, bboxes);
         const buildingPair = await BP.create({
           b1,
           b2,
-          path,
+          path: path.features[0],
         });
         buildingPairs.push(buildingPair.id);
       }
@@ -90,7 +102,7 @@ fastify.post("/users", async (req, res) => {
     firstName,
     lastName,
     classes: buildingPairs,
-    phone
+    phone,
   });
   if (user == null) return res.status(404).send();
   return user;
@@ -123,15 +135,14 @@ fastify.put("/bps/:id", async (req, res) => {
   // const params = [id]
   // const text = 'SELECT * FROM USERS WHERE id = $1'
   const usersList = User.findAll({
-    where: id === bpID
-  })
+    where: id === bpID,
+  });
   buildingPair.currentLength = currentLength;
-  buildingPair.path = newGeo
-  updateUsers(usersList)
+  buildingPair.path = newGeo;
+  // updateUsers(usersList);
   if (id == null) return res.status(404).send();
   return bpID;
 });
-
 
 fastify.post("/bps", async (req, res) => {
   const { b1, b2, path } = req.body;
