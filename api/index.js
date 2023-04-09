@@ -1,8 +1,11 @@
 // import updateUsers from "twilioTest.js";
 require("dotenv").config();
 const turf = require("@turf/turf");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
 const algos = require("./requests");
+const twilio = require("./twilio");
 
 const fastify = require("fastify")({
   logger: true,
@@ -136,26 +139,6 @@ fastify.get("/bps", async (req, res) => {
   return buildingPairs;
 });
 
-fastify.put("/bps/:id", async (req, res) => {
-  const { currentLength, newGeo } = req.params;
-  const buildingPair = await BP.findOne({
-    where: { id },
-  });
-
-  const bpID = buildingPair.id;
-
-  // const params = [id]
-  // const text = 'SELECT * FROM USERS WHERE id = $1'
-  const usersList = User.findAll({
-    where: id === bpID,
-  });
-  buildingPair.currentLength = currentLength;
-  buildingPair.path = newGeo;
-  // updateUsers(usersList);
-  if (id == null) return res.status(404).send();
-  return bpID;
-});
-
 fastify.post("/bps", async (req, res) => {
   const { b1, b2, path } = req.body;
   if (b1 == null || b1 == "" || b2 == null || b2 == "" || path == null)
@@ -197,6 +180,42 @@ fastify.post("/obstacles", async (req, res) => {
     boundary,
   });
   if (obstacle == null) return res.status(404).send();
+  // Update routes and users
+  const obstacles = await Obstacle.findAll();
+  const bboxes = obstacles.map((o) => {
+    const bbox = turf.bbox(o.boundary);
+    return [
+      [bbox[1], bbox[0]],
+      [bbox[3], bbox[2]],
+    ];
+  });
+  const buildingPairs = await BP.findAll();
+  for (const buildingPair of buildingPairs) {
+    const b1Coords = algos.getCoords(buildingPair.b1);
+    const b2Coords = algos.getCoords(buildingPair.b2);
+    const [dist, path] = await algos.req(b1Coords, b2Coords, bboxes);
+    if (Math.abs(dist - buildingPair.length) > 0.01) {
+      await BP.update(
+        { length: dist, path: path.features[0] },
+        { where: { id: buildingPair.id } }
+      );
+      // Update all users with this BP
+      const users = await User.findAll({
+        where: {
+          classes: {
+            [Op.contains]: [buildingPair.id],
+          },
+        },
+      });
+      users.forEach((u) => {
+        twilio.obstacleAdded({
+          phone: `1${u.phone}`,
+          b1: buildingPair.b1,
+          b2: buildingPair.b2,
+        });
+      });
+    }
+  }
   return obstacle;
 });
 

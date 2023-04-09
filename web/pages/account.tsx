@@ -51,12 +51,24 @@ const AccountPage = () => {
   const [style, setStyle] = useState<any>();
 
   useEffect(() => {
-    let u = localStorage.getItem("user");
-    if (u == null || u == "") return;
-    u = JSON.parse(u);
+    let localU = localStorage.getItem("user");
+    if (localU == null || localU == "") return;
+    const u = JSON.parse(localU);
     if (u == null) return;
-    setUser(u);
-    setSelBP(0);
+    axios
+      .post(`${process.env.API_URL}/auth`, {
+        username: u.username,
+        password: u.password,
+      })
+      .then((res) => {
+        const us = res.data;
+        localStorage.setItem("user", JSON.stringify(us));
+        setUser(us);
+        setSelBP(0);
+      })
+      .catch((err) => {
+        alert("ERROR");
+      });
   }, []);
 
   useEffect(() => {
