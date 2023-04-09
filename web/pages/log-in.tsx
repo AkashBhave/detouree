@@ -9,12 +9,15 @@ import {
   VStack,
   Button,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import axios from "axios";
 
 const Home = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  const router = useRouter();
 
   const submit = () => {
     if (username == "" || password == "") return;
@@ -23,8 +26,11 @@ const Home = () => {
       .then((res) => {
         const user = res.data;
         localStorage.setItem("user", JSON.stringify(user));
+        window.location.href = "/account";
       })
-      .catch((err) => {});
+      .catch((err) => {
+        alert("ERROR");
+      });
   };
 
   return (
