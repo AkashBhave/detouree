@@ -46,6 +46,9 @@ const BP = sequelize.define("bp", {
   path: {
     type: Sequelize.JSON,
   },
+  currentLength: {
+    type: Sequelize.INTEGER
+  }
 });
 
 const Obstacle = sequelize.define("obstacle", {
@@ -64,7 +67,7 @@ const Obstacle = sequelize.define("obstacle", {
     type: Sequelize.STRING,
   },
   boundary: {
-    type: Sequelize.JSON,
+    type: Sequelize.ARRAY,
   },
 });
 

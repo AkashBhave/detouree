@@ -1,4 +1,6 @@
+import updateUsers from 'twilioTest.js'
 require("dotenv").config();
+
 const fastify = require("fastify")({
   logger: true,
 });
@@ -43,7 +45,11 @@ fastify.post("/users", async (req, res) => {
     firstName == null ||
     firstName == "" ||
     lastName == null ||
-    lastName == ""
+    lastName == "" ||
+    classes == null ||
+    classes == "" ||
+    phone == null ||
+    phone == "" 
   ) {
     return res.status(400).send();
   }
@@ -84,6 +90,7 @@ fastify.post("/users", async (req, res) => {
     firstName,
     lastName,
     classes: buildingPairs,
+    phone
   });
   if (user == null) return res.status(404).send();
   return user;
@@ -104,6 +111,27 @@ fastify.get("/bps", async (req, res) => {
   if (buildingPairs == null) return res.status(500).send();
   return buildingPairs;
 });
+
+fastify.put("/bps/:id", async (req, res) => {
+  const { currentLength, newGeo } = req.params;
+  const buildingPair = await BP.findOne({
+    where: { id },
+  });
+
+  const bpID = buildingPair.id;
+
+  // const params = [id]
+  // const text = 'SELECT * FROM USERS WHERE id = $1'
+  const usersList = User.findAll({
+    where: id === bpID
+  })
+  buildingPair.currentLength = currentLength;
+  buildingPair.path = newGeo
+  updateUsers(usersList)
+  if (id == null) return res.status(404).send();
+  return bpID;
+});
+
 
 fastify.post("/bps", async (req, res) => {
   const { b1, b2, path } = req.body;
