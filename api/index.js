@@ -22,7 +22,17 @@ fastify.register(require("@fastify/cors"), (instance) => {
   };
 });
 
-const { dbinit, User, BP, Obstacle } = require("./db");
+const { dbreset, User, BP, Obstacle } = require("./db");
+
+const joinBP = async (user) => {
+  for (let i = 0; i < user.classes.length; i += 1) {
+    const buildingPair = await BP.findOne({
+      where: { id: user.classes[i] },
+    });
+    user.classes[i] = buildingPair;
+  }
+  return user;
+};
 
 fastify.get("/", function (req, reply) {
   reply.send("Welcome to Detouree!");
@@ -90,13 +100,14 @@ fastify.post("/users", async (req, res) => {
           b1,
           b2,
           path: path.features[0],
+          length: dist,
         });
         buildingPairs.push(buildingPair.id);
       }
     }
   }
 
-  const user = await User.create({
+  let user = await User.create({
     username,
     password,
     firstName,
@@ -105,6 +116,7 @@ fastify.post("/users", async (req, res) => {
     phone,
   });
   if (user == null) return res.status(404).send();
+  user = joinBP(user);
   return user;
 });
 
@@ -210,10 +222,11 @@ fastify.post("/obstacles/:id/updates", async (req, res) => {
 fastify.post("/auth", async (req, res) => {
   const { username, password } = req.body;
   if (username == null || password == null) return res.status(400).send();
-  const user = await User.findOne({
+  let user = await User.findOne({
     where: { username },
   });
   if (user == null || user.password != password) return res.status(404).send();
+  user = joinBP(user);
   return user;
 });
 

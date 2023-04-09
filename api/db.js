@@ -46,9 +46,9 @@ const BP = sequelize.define("bp", {
   path: {
     type: Sequelize.JSON,
   },
-  // currentLength: {
-  //   type: Sequelize.INTEGER,
-  // },
+  length: {
+    type: Sequelize.FLOAT,
+  },
 });
 
 const Obstacle = sequelize.define("obstacle", {
@@ -70,6 +70,13 @@ const Obstacle = sequelize.define("obstacle", {
     type: Sequelize.JSON,
   },
 });
+
+const dbreset = async () => {
+  await User.sync({ force: true });
+  await BP.sync({ force: true });
+  await Obstacle.sync({ force: true });
+  console.log("reset complete");
+};
 
 const dbinit = async () => {
   await User.sync({ force: true });
@@ -206,4 +213,4 @@ const dbinit = async () => {
   obstacles.forEach((o) => console.log(o.name));
 };
 
-module.exports = { sequelize, User, BP, Obstacle, dbinit };
+module.exports = { sequelize, User, BP, Obstacle, dbinit, dbreset };

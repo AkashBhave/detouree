@@ -97,18 +97,18 @@ const Home = () => {
           <NavigationControl />
         </Map>
         <Box w="500px" h="full" p={4}>
+          <Heading as="h1" fontSize={32} mb={4}>
+            Campus Map
+          </Heading>
           <VStack align="start" divider={<StackDivider />}>
             {obstacles.map((o) => (
               <Box p={2} w="full" key={o.id} cursor="pointer">
-                <Heading
-                  as="h2"
-                  fontSize="2xl"
-                  fontWeight="normal"
+                <Text
                   color={o.id == selObstacle ? "blue.600" : "black"}
                   onClick={() => setSelObstacle(o.id)}
                 >
                   {o.name}
-                </Heading>
+                </Text>
               </Box>
             ))}
           </VStack>
