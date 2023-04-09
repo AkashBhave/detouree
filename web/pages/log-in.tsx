@@ -49,7 +49,7 @@ const Home = () => {
             w="500px"
             border="1px solid lightgray"
             p={4}
-            fontSize={24}
+            fontSize="lg"
             rounded="md"
             spacing={6}
           >
